@@ -796,7 +796,7 @@ label.required::after {
 
     async function loadReasons() {
   try {
-    const response = await fetch("YOUR_APPS_SCRIPT_URL?endpoint=getReasons");
+    const response = await fetch(FORM_ACTION+"endpoint=getReasons");
     const reasons = await response.json();
     const select = document.getElementById("reason");
 
