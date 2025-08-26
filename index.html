@@ -436,6 +436,7 @@ label.required::after {
 
 
     <div id="status"></div>
+    <input type="hidden" id="location" value="">
   </div>
 
   <!-- hidden iframe used to submit the Google Form so the page doesn't navigate -->
@@ -607,54 +608,29 @@ label.required::after {
       
 
       showWelcomeMessage(name,false);
-
-      /*
-          // validation
-    if (!reason) {
-      status.textContent = 'Please select what you are here for today.';
-      return;
     }
 
-    if (reason === "Event" && !event) {
-      status.textContent = 'Please specify the event.';
-      return;
-    }
-
-    if (reason === "Other" && !other) {
-      status.textContent = 'Please specify your reason.';
-      return;
-    }
-      
-    */
-
-      /*if (rememberToggle.checked){
-        status.innerHTML = `Welcome ${name}, you are checked in!<br>Your name will be remembered for next time on this device.`;
-      } else {
-        status.textContent = `Welcome ${name}, you are checked in!`;
-      }*/
-      
-      //setTimeout(() => {clearDisplay(); status.textContent = ''; }, 5000);
-    }
-
+    
     function handleReasonSubmit (name,phone,email,grad,birthday,faculty,reason,other,force = false) {
 
-   if(!force){
-    // reason validation
-    if (!reason) {
-        status.textContent = 'Please select what you are here for today.';
-        return;
+    if(!force){
+      // reason validation
+      if (!reason) {
+          status.textContent = 'Please select what you are here for today.';
+          return;
+      }
+      if (reason === "Other" && !other) {
+          status.textContent = 'Please specify your reason.';
+          return;
+      }
     }
-    if (reason === "Other" && !other) {
-        status.textContent = 'Please specify your reason.';
-        return;
-    }
-  }
 
     status.textContent = '';
 
-  
-    // submit all data to Google
-    submitGoogle({ name:name, phone:phone, email:email, grad:grad, birthday:birthday, faculty:faculty, reason:reason, other:other});
+    const location = document.getElementById('location').value || "unknown";
+
+    const data = { name, phone, email, grad, birthday, faculty, reason, other, location };
+    submitGoogle(data);
 
     welcomeMessage.classList.remove('status-auto', 'status-success'); //remove existing
     welcomeMessage.classList.add('status-success');  // green for normal
@@ -763,6 +739,11 @@ label.required::after {
 
     // on load: if saved, auto-submit
     window.addEventListener("load", () => {
+      const locationParam = getQueryParam('location');
+      if(locationParam) {
+        document.getElementById('location').value = locationParam;
+      }
+
       loadReasons();
       const savedName = localStorage.getItem("clubName");
       const savedPhone = localStorage.getItem("clubPhone") || "";
@@ -793,6 +774,11 @@ label.required::after {
       
         
     });
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
 
     async function loadReasons() {
   try {
