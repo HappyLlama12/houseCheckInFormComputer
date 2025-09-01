@@ -1,0 +1,815 @@
+<!--
+Club Check-In Page
+
+INSTRUCTIONS:
+1) Replace the CONFIG values below:
+    const FORM_ACTION = "https://";
+   
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hillel Check-In</title>
+  <style>
+    @font-face {
+      font-family: 'Neue Montreal';
+      src: url('./fonts/NeueMontreal-Regular.otf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+  
+    @font-face {
+      font-family: 'Gilroy';
+      src: url('./fonts/Gilroy-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Gilroy Bold';
+      src: url('./fonts/Gilroy-Bold.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root{--bg:#f6f6f8;--card:#ffffff;--accent:rgb(5,49,154);--muted:#666}
+    html,body{height:100%;margin:0;font-family: 'Gilroy', system-ui, sans-serif;}
+    /* Entire page uses Gilroy */
+    /* Background wrapper for the image (blurred) */
+#background-wrapper {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('hillel.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(3px);  /* only the background is blurred */
+  z-index: 0;
+}
+
+/* Dark overlay */
+#background-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 1;
+}
+
+html, body{
+  overflow:hidden;
+}
+
+body {
+  margin: 0;
+  padding: 20px;        /* adds breathing room from top/edges */
+  position: relative;
+  z-index: 2;
+  font-size: 13px;
+  overflow-y: auto;      /* ensures scroll if content taller than screen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Your card */
+.card {
+  position: relative;
+  z-index: 2;
+  width: 400px;
+  max-width: 92vw;
+  background: var(--card);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  text-align: left;
+  font-size: 130%;
+  margin: 0 auto;        /* centers card horizontally */
+}
+    strong, b {
+      font-family: 'Gilroy Bold', 'Gilroy', system-ui, sans-serif;
+      font-weight: 900;
+     /* color: #000;*/ /* optional: makes it true black */
+    }
+    /* Only h1 uses Neue Montreal */
+    h1 {
+      margin: 6px 0 18px 0;
+      /*margin-top: 6px;            /* Remove bottom margin */
+      /*margin-bottom: 16px;       /* more space below heading */
+      font-family: 'Neue Montreal', system-ui, sans-serif;
+      font-weight: 850;
+      font-style: normal;
+      font-size: 38px;           /* Desktop font size */
+      line-height: 1em;
+      letter-spacing: -0.5px;
+      color: rgb(5, 49, 154);    /* Optional: add this if you want the blue color */
+    }
+    @media (max-width: 1023px) {
+      h1 {
+        font-size: 22px;
+      }
+    }
+    h2{
+      margin: 0 0 0;             /* Remove bottom margin */      /* more space below heading */
+      font-family: 'Neue Montreal', system-ui, sans-serif;
+      font-weight: 500;
+      font-style: normal;
+      color: #292d32;
+      font-size: 24px;           /* Desktop font size */
+      line-height: 1em;
+      letter-spacing: -0.5px;
+      /*color: rgb(5, 49, 154);*/    /* Optional: add this if you want the blue color */
+    }
+    @media (max-width: 1023px) {
+      h2 {
+        font-size: 16px;
+      }
+    }
+
+    /* Placeholder text also scales */
+input::placeholder,
+textarea::placeholder {
+  font-size: 1em;
+}
+
+    input[type=text],
+input[type=tel],
+input[type=email],
+input[type=grad],
+input[type=date],
+select,
+textarea,
+button.action,
+#submitReasonButton,
+#reasonDropdown {
+  font-size: 1em; /* 1em = 125% of default, inherits from .card */
+}
+    
+    input[type=text],input[type=tel],input[type=email],input[type=date]{width:100%;padding:10px 10px;font-size:12px;margin-bottom:8px;border-radius:5px;border:none; background-color: rgb(230,230,230); box-sizing:border-box; font-family: Gilroy, Arial, Helvetica, sans-serif; color: rgb(52,58,64);}
+    input[type=text]:focus, input[type=email]:focus,input[type=tel]:focus,input[type=date]:focus,select:focus{
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 3px var(--accent);
+    }
+    /*input[type=text]::placeholder {
+      font-weight: normal;
+      font-family: Gilroy, Arial, Helvetica, sans-serif;
+      font-size: 17px;
+      color: rgb(52, 58, 64) !important;
+    }
+      */
+    button.action{width: 100%;height: auto; background-color: rgb(5,49,154); color: white; border: none; border-radius: 5px; padding: 8px 14px; font-family: 'Gilroy Bold', system-ui, sans-serif;font-size: 18px; cursor: pointer; letter-spacing: 0px; text-align: center; line-height: 1.2;}
+    button.action:hover { background-color: rgb(4,40,125); }
+    .outlined-btn{background: #d3d3d3; border: 3px #363636;color: #363636;border-radius: 4px;padding: 4px 8px;cursor: pointer;margin: 2px;font-size: 12px;}
+    #status{margin-top:8px;font-weight:600;font-size:12px; color: #b00020; text-align: center; /* add this */}
+    .footer{margin-top:12px;font-size:12px;color:var(--muted);font-weight: 600}
+    .danger{color:#b00020}
+    .row{display:flex;gap:8px}
+    .remember-text {
+      font-family: Gilroy, Arial, Helvetica, sans-serif;
+      color: rgb(52, 58, 64);
+      font-weight: 500;  /* normal weight */
+      font-size: 14px;
+      margin-left: 8px;
+      margin-bottom: 4px;
+      user-select: none; /* optional, if you want to prevent text selection */
+      vertical-align: middle; /* to align with the toggle nicely */
+    }
+      #eraseLink {
+        margin-top: 4px;
+        font-size: 12px;
+        color: rgb(52,58,64);
+      }
+    #welcomeMessage{
+        margin-top: 8px;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 15px;
+        color: #0b5cff;
+        text-align: center; /* add this */
+      }
+
+      #welcomeMessage.status-auto {
+        color: #0b5cff; /* blue */
+      }
+
+      #welcomeMessage.status-success {
+        color: green;
+      }
+      select {
+        width: 100%;
+        padding: 10px 36px 10px 12px; /* top right bottom left*/
+        margin-bottom: 8px;
+        font-size: 12px;
+        border-radius: 5px;
+        border: none;
+        background-color: rgb(230, 230, 230);
+        font-family: Gilroy, Arial, Helvetica, sans-serif;
+        box-sizing: border-box;
+        color: rgb(52,58,64);
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        cursor: pointer;
+
+        background-image: url('data:image/svg+xml;utf8,<svg fill="dark gray" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+      }
+      /*input[type=date] {
+        font-family: 'Gilroy', system-ui, sans-serif;
+        color: rgb(52,58,64);
+      }
+      */
+
+      #inputSection input,
+#reasonSection input,
+#reasonSection select,
+#reasonSection textarea {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+      input::placeholder, textarea::placeholder {
+        color:#808080 !important;
+        font-weight: normal;
+        font-family: 'Gilroy', Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        font-size: 1em
+      }
+      select {
+  position: relative;
+  z-index: 2; /* bring above background overlay */
+}
+
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--accent);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+
+#inputSection{
+  max-width: 400px; /* optional: keeps form neat */
+}
+
+#inputSection label, #reasonSection label{
+  display: block;
+  margin-left: 4px;
+  margin-bottom: 4px;
+  font-weight: bold;
+  text-align: left; /* ensures left alignment */
+  color: #292d32;
+}
+#reasonSection {
+  display: none;
+  max-width: 400px;
+     /* space above the whole section */
+  margin-top: 6px;
+     padding: 10px 12px;         /* breathing room inside */
+  background: rgba(255,255,255,0.8); /* optional soft background */
+  border-radius: 12px;   /* rounded corners */
+}
+
+#reasonSection h2 {
+  font-size: 16px;
+  margin-bottom: 6px;   /* space below the heading */
+  color: #0b5cff;        /* consistent with welcome message */
+}
+
+/* Optional: extra spacing above the 'Please specify' inputs */
+#reasonOther {
+    margin-bottom: 14px;
+}
+
+#reasonDropdown {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 14px;   /* space between dropdown and button */
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+#submitReasonButton {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0b5cff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 14px;
+}
+
+#submitReasonButton:hover {
+  background-color: #0945c2;
+}
+
+label.required::after {
+  content: " *";          /* or " &" if you prefer ampersand */
+  color: red;
+  font-size: 1.2em;       /* slightly bigger than the label text */
+  font-weight: bold;      /* make it more visible */
+  vertical-align: middle; /* aligns nicely with text */
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+</style>
+</head>
+<body>
+  <div id="background-wrapper"></div>
+  <div id="background-overlay"></div>
+  <div class="card" role="main">
+    
+    <h1><strong>Hillel Queen's Check In</strong></h1>
+
+    <div id="inputSection">
+      <label for="fullName" class="required">Full Name</label>
+      <input type="text" id="fullName" placeholder="Enter your name" />
+
+      <label for="phone">Telephone Number</label>
+      <input type="tel" id="phone" placeholder="Enter your phone number (optional)" />
+
+      <label for="email" class = "required">Email Address</label>
+      <input type="email" id="email" placeholder="Enter your email address" />
+
+      <label for="grad" class = "required">Expected Graduation Year</label>
+      <input type="text" id="grad" placeholder="Enter your expected year of graduation" />
+
+
+      <label for="birthday" class = "required">When is your birthday? (We want to celebrate you!!)</label>
+      <input type="date" id="birthday" />
+
+      <label for="faculty" class = "required">Faculty</label>
+      <select id="faculty">
+        <option value="" disabled selected>Select Faculty</option>
+        <option value="Faculty of Arts and Science">Faculty of Arts and Science</option>
+        <option value="Faculty of Education">Faculty of Education</option>
+        <option value="Faculty of Health Sciences">Faculty of Health Sciences</option>
+        <option value="Faculty of Law">Faculty of Law</option>
+        <option value="School of Graduate Studies and Postdoctoral Affairs">School of Graduate Studies and Postdoctoral Affairs</option>
+        <option value="MD Program">MD Program</option>
+        <option value="School of Nursing">School of Nursing</option>
+        <option value="Smith Engineering">Smith Engineering</option>
+        <option value="Smith School of Business">Smith School of Business</option>
+        <option value="Bader College">Bader College</option>
+      </select>
+
+      <button id="submitButton" class="action" type = "button">Submit</button>
+
+      <div style="margin-top:14px; text-align:left; display: flex; align-items: center;">
+        <label class="switch">
+          <input type="checkbox" id="rememberToggle" checked>
+          <span class="slider"></span>
+        </label>
+        <span class="remember-text">Remember my name for next time</span>
+      </div>
+    </div>
+
+    <div id="welcomeMessage" style="display:none;"></div>
+
+
+    <div id="reasonSection">
+    <label for="reason">What are you here for today?</label>
+    <select id="reason">
+        <option value="" disabled selected>Select one</option>
+    </select>
+
+    <input type="text" id="reasonOther" placeholder="Please specify" style="display:none;" />
+
+    <button id="submitReasonButton" class="action">Check In</button>
+
+    </div>
+
+    <div id="eraseLink">
+      If your name is currently saved and you want it to be erased click 
+      <a href="#" id="eraseNow">here</a>.
+    </div>
+
+
+    <div id="status"></div>
+    <input type="hidden" id="location" value="">
+  </div>
+
+  <!-- hidden iframe used to submit the Google Form so the page doesn't navigate -->
+  <!--<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+-->
+
+   <!--<form action="https://docs.google.com/forms/d/e/1FAIpQLSe6WCyUZUTdwGfrdI4o7sS9rYbmhnH-ysystS9rDprSf5zSwA/formResponse" method="POST" target="_blank">
+  <input name="entryl1262182397" value="Test User">
+  <button type="submit">Test Submit</button>
+</form> -->
+   
+  <script>
+    // ===== CONFIG =====
+    // replace as such: https://docs.google.com/forms/d/e/REPLACE THIS/formResponse
+    const FORM_ACTION = "https://script.google.com/macros/s/AKfycbxVJln3OZuNPDo3gDyv4JOT3aiDTh_lOPQHbHjgbn75jsxTI4HcGc1HE1bdVsUeSMG0lA/exec";
+    const REASON_CSV_LINK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIDqyRFYHa7Ir22eNMypRrU1ZXgXJoacC5LaSP7e4Jkc_tTNwKNlyoPGGPYXzQKDTayS_5chGPzrBK/pub?gid=0&single=true&output=csv";
+
+
+
+    const submitButton = document.getElementById('submitButton');
+    const status = document.getElementById('status');
+    const nameInput = document.getElementById('fullName');
+    const rememberToggle = document.getElementById('rememberToggle');
+    const inputSection = document.getElementById('inputSection');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    const reasonSection = document.getElementById('reasonSection');
+    const reasonSelect = document.getElementById('reason');
+    const reasonOther = document.getElementById('reasonOther');
+
+    submitButton.addEventListener('click', handleSubmit);
+
+    reasonSelect.addEventListener('change', () => {
+      reasonOther.style.display = reasonSelect.value === "Other" ? "block" : "none";
+      reasonOther.value = "";
+    });
+
+    function showWelcomeMessage(name, isAuto=false) {
+      inputSection.style.display = 'none';
+
+      reasonSelect.value = "";      // reset dropdown
+      reasonOther.value = "";
+      
+
+      let welcomeText;
+      if(isAuto){
+        welcomeText = `Welcome back ${name}, <strong>please select why you are here today.</strong><br>This page will submit in 20 seconds.`;
+      } else {
+        welcomeText = `Welcome ${name}, <strong>please select why you are here today.</strong><br>This page will submit in 20 seconds.`;
+      }
+        /*
+        const welcomeText = isAuto
+        ? `Welcome back ${name}, you are checked in!`
+        :(rememberToggle.checked
+          ? `Welcome ${name}, you are checked in!<br>Your name will be remembered for next time on this device.`
+          : `Welcome ${name}, you are checked in!`);
+          */
+
+      welcomeMessage.classList.remove('status-auto', 'status-success');
+      welcomeMessage.classList.add('status-auto');
+      welcomeMessage.innerHTML = welcomeText;
+      welcomeMessage.style.display = 'block';
+ 
+      reasonSection.style.display = 'block';
+
+      /*
+      welcomeMessage.classList.remove('status-auto', 'status-success');
+      if (isAuto) {
+        welcomeMessage.classList.add('status-auto');
+      } else {
+        welcomeMessage.classList.add('status-success');  // green for normal
+      }
+      */
+
+     setTimeout(() => {
+  if (reasonSection.style.display === 'block') {
+    reasonSection.style.display = 'none';
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const grad = document.getElementById('grad').value.trim();
+    const birthday = document.getElementById('birthday').value;
+    const faculty = document.getElementById('faculty').value;
+
+    // Include reason/event/other or empty strings if not filled
+    const reason = reasonSelect.value || "";
+    const other = reasonOther.value.trim() || "";
+
+    handleReasonSubmit(name, phone, email, grad,birthday, faculty, reason, other, true);
+  }
+}, 20000); // 12000ms = 12s
+
+
+         }
+
+    function hideWelcomeMessage() {
+      welcomeMessage.style.display = 'none';
+      reasonSection.style.display = 'none';
+      inputSection.style.display = 'block';
+    }
+
+    function handleSubmit(){
+      
+      //name=nameInput.value.trim(),phone=document.getElementById('phone').value.trim(),email=document.getElementById('email').value.trim(),birthday=document.getElementById('birthday').value,faculty=document.getElementById('faculty').value
+      const name = nameInput.value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const grad = document.getElementById('grad').value.trim();
+      const birthday = document.getElementById('birthday').value;
+      const faculty = document.getElementById('faculty').value;
+      const reason = reasonSelect.value;
+      const other = reasonOther.value.trim();
+      
+
+
+      //clear any previous error
+      status.textContent = '';
+      welcomeMessage.style.display = 'none';
+
+      //validate name
+       if (!name) {
+          nameInput.focus()
+          status.textContent = 'Please enter your full name.';
+          welcomeMessage.style.display = 'none';
+          return;
+      }
+
+      //validate phone (simple regex for 10 digits)
+      // Phone validation: only if not empty
+      if (phone) {
+        // Remove everything except digits
+        const phoneDigits = phone.replace(/\D/g, "");
+
+        if (phoneDigits.length !== 10) {
+        alert("Please enter a valid phone number with 10 digits, or leave it blank.");
+        return;
+        }
+      }
+
+      // Validate Email (simple email regex)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        status.textContent = 'Please enter a valid email address.';
+        return;
+      }
+
+      //validate grad year
+      if (grad.length!==4||isNaN(grad)){
+        status.textContent = 'Please enter a valid 4-digit graduation year.';
+        return;
+      }
+
+      // Validate Birthday (ensure not empty)
+      if (!birthday) {
+        status.textContent = 'Please enter your birthday.';
+        return;
+      }
+
+      // Validate Faculty (ensure selected)
+      if (!faculty) {
+        status.textContent = 'Please select your faculty.';
+        return;
+      }
+
+      //save only name to local storage for if toggle is checked
+      if (rememberToggle.checked) {
+        localStorage.setItem("clubName", name);
+        localStorage.setItem("clubPhone", phone);
+        localStorage.setItem("clubGrad", grad);
+        localStorage.setItem("clubEmail", email);
+        localStorage.setItem("clubBirthday", birthday);
+        localStorage.setItem("clubFaculty", faculty);
+      }
+      
+
+      showWelcomeMessage(name,false);
+    }
+
+    
+    function handleReasonSubmit (name,phone,email,grad,birthday,faculty,reason,other,force = false) {
+
+    if(!force){
+      // reason validation
+      if (!reason) {
+          status.textContent = 'Please select what you are here for today.';
+          return;
+      }
+      if (reason === "Other" && !other) {
+          status.textContent = 'Please specify your reason.';
+          return;
+      }
+    }
+
+    status.textContent = '';
+
+    const location = document.getElementById('location').value || "unknown";
+
+    const data = { name, phone, email, grad, birthday, faculty, reason, other, location };
+    submitGoogle(data);
+
+    welcomeMessage.classList.remove('status-auto', 'status-success'); //remove existing
+    welcomeMessage.classList.add('status-success');  // green for normal
+
+    welcomeMessage.innerHTML = `Thank you ${name}, you are checked in!`;
+    welcomeMessage.style.display = 'block';
+}
+    
+
+    function clearDisplay() {
+      nameInput.value = '';
+      status.textContent = '';
+      status.classList.remove("status-auto");
+    }
+
+    /*function submitGoogle(data){
+       
+      // build a form and submit it to the Google Form response endpoint inside the hidden iframe
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = FORM_ACTION;
+      form.target = 'hidden_iframe';
+
+      console.log("Submitting data to Google:", data);
+
+      for (const key in data) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = data[key];
+        form.appendChild(input);
+      }
+
+      // append & submit
+      document.body.appendChild(form);
+      form.submit();
+
+      // cleanup after a short delay
+      setTimeout(()=>{ try{ document.body.removeChild(form);}catch(e){} }, 1500);
+    }
+      */
+
+    function submitGoogle(data) {
+      console.log("Submitting data to Google Web App:", data);
+
+      fetch(FORM_ACTION, {
+        method: 'POST',
+        mode: 'no-cors',   // prevents CORS errors
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(() => {
+        console.log('Data sent successfully');
+      })
+      .catch((err) => {
+        console.error('Error sending data:', err);
+        status.textContent = "Error submitting your check-in. Please try again.";
+      });
+    }
+    
+    document.getElementById('eraseNow').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem("clubName");
+      localStorage.removeItem("clubPhone");
+      localStorage.removeItem("clubEmail");
+      localStorage.removeItem("clubGrad");
+      localStorage.removeItem("clubBirthday");
+      localStorage.removeItem("clubFaculty");
+
+      nameInput.value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('grad').value = "";
+      document.getElementById('birthday').value = '';
+      document.getElementById('faculty').value = '';
+      
+      status.textContent = 'Your saved profile has been removed.';
+      hideWelcomeMessage();
+      setTimeout(() => { status.textContent = ''; }, 5000);
+    });
+
+
+    document.getElementById('submitReasonButton').addEventListener('click', () => {
+      reasonSection.style.display ='none';
+   const name = nameInput.value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const grad = document.getElementById('grad').value.trim();
+    const birthday = document.getElementById('birthday').value;
+    const faculty = document.getElementById('faculty').value;
+    const reason = reasonSelect.value;
+    const other = reasonOther.value.trim();
+
+    handleReasonSubmit(name, phone, email, grad, birthday, faculty, reason, other);
+    });
+
+
+    /*
+    clearBtn.addEventListener('click', () => {
+      clearDisplay();
+    }); */
+
+    // ORRRRRR clearBtn.addEventListener('click', clearDisplay);
+
+    // on load: if saved, auto-submit
+    window.addEventListener("load", () => {
+      const locationParam = getQueryParam('location');
+      if(locationParam) {
+        document.getElementById('location').value = locationParam;
+      }
+
+      loadReasons();
+      const savedName = localStorage.getItem("clubName");
+      const savedPhone = localStorage.getItem("clubPhone") || "";
+      const savedEmail = localStorage.getItem("clubEmail");
+      const savedGrad = localStorage.getItem("clubGrad");
+      const savedBirthday = localStorage.getItem("clubBirthday");
+      const savedFaculty = localStorage.getItem("clubFaculty");
+
+      if (savedName) {
+        status.classList.add("status-auto");
+        status.classList.remove("status-success");
+    
+        nameInput.value = savedName; //keep filled for quick check-in
+        document.getElementById('phone').value = savedPhone;
+        document.getElementById('email').value = savedEmail;
+        document.getElementById('grad').value = savedGrad;
+        document.getElementById('birthday').value = savedBirthday;
+        document.getElementById('faculty').value = savedFaculty;
+
+        rememberToggle.checked = true;
+        showWelcomeMessage(savedName, true);
+
+        //setTimeout(() => {clearDisplay(); status.textContent = ""; status.classList.remove("status-auto"); }, 5000);
+      } else {
+        rememberToggle.checked = true;
+        hideWelcomeMessage();
+      }
+      
+        
+    });
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    async function loadReasons() {
+  try {
+    const response = await fetch(REASON_CSV_LINK);
+    const text = await response.text();
+    console.log("Fetched CSV:", text);  // <- check if this prints anything
+    const reasons = text.split(/\r?\n/).map(r => r.trim()).filter(r => r);
+
+    const select = document.getElementById("reason");
+    select.innerHTML = '<option value="" disabled selected>Select one</option>';
+    
+    reasons.forEach(r => {
+      const opt = document.createElement("option");
+      opt.value = r;
+      opt.textContent = r;
+      select.appendChild(opt);
+    });
+
+    if (!reasons.includes("Other")) {
+      const otherOpt = document.createElement("option");
+      otherOpt.value = "Other";
+      otherOpt.textContent = "Other";
+      select.appendChild(otherOpt);
+    }
+  } catch (err) {
+    console.error("Failed to load events:", err);
+  }
+}
+  </script>
+</body>
+</html>
