@@ -407,7 +407,6 @@ label.required::after {
 
     function showWelcomeMessage(name, isAuto=false) {
       inputSection.style.display = 'none';
-      reasonSection.style.display = 'block';
 
       reasonSelect.value = "";      // reset dropdown
       reasonOther.value = "";
@@ -419,6 +418,7 @@ label.required::after {
       welcomeMessage.classList.remove('status-auto', 'status-success');
       welcomeMessage.classList.add('status-auto');
       welcomeMessage.innerHTML = welcomeText;
+      reasonSection.style.display = 'block';
       welcomeMessage.style.display = 'block';
  
       
