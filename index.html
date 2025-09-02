@@ -661,8 +661,8 @@ label.required::after {
         
         reasons.forEach(r => {
           const opt = document.createElement("option");
-          opt.value = reason;
-          opt.textContent = reason;
+          opt.value = r;
+          opt.textContent = r;
           reasonSelect.appendChild(opt);
         });
 
