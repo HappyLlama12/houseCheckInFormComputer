@@ -650,32 +650,32 @@ label.required::after {
     }
 
     async function loadReasons() {
-  try {
-    const response = await fetch(REASON_CSV_LINK);
-    const text = await response.text();
-    console.log("Fetched CSV:", text);  // <- check if this prints anything
-    const reasons = text.split(/\r?\n/).map(r => r.trim()).filter(r => r);
+      try {
+        const response = await fetch(REASON_CSV_LINK);
+        const text = await response.text();
+        console.log("Fetched CSV:", text);  // <- check if this prints anything
+        const reasons = text.split(/\r?\n/).map(r => r.trim()).filter(r => r);
 
-    const select = document.getElementById("reason");
-    select.innerHTML = '<option value="" disabled selected>Select one</option>';
-    
-    reasons.forEach(r => {
-      const opt = document.createElement("option");
-      opt.value = r;
-      opt.textContent = r;
-      select.appendChild(opt);
-    });
+        const reasonSelect = document.getElementById("reason");
+        reasonSelect.innerHTML = '<option value="" disabled selected>Select one</option>';
+        
+        reasons.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = reason;
+          opt.textContent = reason;
+          reasonSelect.appendChild(opt);
+        });
 
-    if (!reasons.includes("Other")) {
-      const otherOpt = document.createElement("option");
-      otherOpt.value = "Other";
-      otherOpt.textContent = "Other";
-      select.appendChild(otherOpt);
+        if (!reasons.includes("Other")) {
+          const otherOpt = document.createElement("option");
+          otherOpt.value = "Other";
+          otherOpt.textContent = "Other";
+          reasonSelect.appendChild(otherOpt);
+        }
+      } catch (err) {
+        console.error("Failed to load events:", err);
+      }
     }
-  } catch (err) {
-    console.error("Failed to load events:", err);
-  }
-}
   </script>
 </body>
 </html>
