@@ -169,21 +169,6 @@ button.action,
     .footer{margin-top:12px;font-size:12px;color:var(--muted);font-weight: 600}
     .danger{color:#b00020}
     .row{display:flex;gap:8px}
-    .remember-text {
-      font-family: Gilroy, Arial, Helvetica, sans-serif;
-      color: rgb(52, 58, 64);
-      font-weight: 500;  /* normal weight */
-      font-size: 14px;
-      margin-left: 8px;
-      margin-bottom: 4px;
-      user-select: none; /* optional, if you want to prevent text selection */
-      vertical-align: middle; /* to align with the toggle nicely */
-    }
-      #eraseLink {
-        margin-top: 4px;
-        font-size: 12px;
-        color: rgb(52,58,64);
-      }
     #welcomeMessage{
         margin-top: 8px;
         margin-bottom: 6px;
@@ -248,46 +233,6 @@ button.action,
       select {
   position: relative;
   z-index: 2; /* bring above background overlay */
-}
-
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 46px;
-  height: 24px;
-  vertical-align: middle;
-}
-
-.switch input {display:none;}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #ccc;
-  transition: .3s;
-  border-radius: 24px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: .3s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: var(--accent);
-}
-
-input:checked + .slider:before {
-  transform: translateX(22px);
 }
 
 
@@ -405,15 +350,6 @@ label.required::after {
 
       <button id="submitButton" class="action" type = "button">Submit</button>
 
-      <div style="margin-top:14px; text-align:left; display: flex; align-items: center;">
-        <label class="switch">
-          <input type="checkbox" id="rememberToggle" checked>
-          <span class="slider"></span>
-        </label>
-        <span class="remember-text">Remember my name for next time</span>
-      </div>
-    </div>
-
     <div id="welcomeMessage" style="display:none;"></div>
 
 
@@ -427,11 +363,6 @@ label.required::after {
 
     <button id="submitReasonButton" class="action">Check In</button>
 
-    </div>
-
-    <div id="eraseLink">
-      If your name is currently saved and you want it to be erased click 
-      <a href="#" id="eraseNow">here</a>.
     </div>
 
 
@@ -459,7 +390,6 @@ label.required::after {
     const submitButton = document.getElementById('submitButton');
     const status = document.getElementById('status');
     const nameInput = document.getElementById('fullName');
-    const rememberToggle = document.getElementById('rememberToggle');
     const inputSection = document.getElementById('inputSection');
     const welcomeMessage = document.getElementById('welcomeMessage');
     const reasonSection = document.getElementById('reasonSection');
@@ -480,19 +410,8 @@ label.required::after {
       reasonOther.value = "";
       
 
-      let welcomeText;
-      if(isAuto){
-        welcomeText = `Welcome back ${name}, <strong>please select why you are here today.</strong><br>This page will submit in 20 seconds.`;
-      } else {
-        welcomeText = `Welcome ${name}, <strong>please select why you are here today.</strong><br>This page will submit in 20 seconds.`;
-      }
-        /*
-        const welcomeText = isAuto
-        ? `Welcome back ${name}, you are checked in!`
-        :(rememberToggle.checked
-          ? `Welcome ${name}, you are checked in!<br>Your name will be remembered for next time on this device.`
-          : `Welcome ${name}, you are checked in!`);
-          */
+      let welcomeText= `Welcome ${name}, <strong>please select why you are here today.</strong><br>This page will submit in 20 seconds.`;
+        
 
       welcomeMessage.classList.remove('status-auto', 'status-success');
       welcomeMessage.classList.add('status-auto');
@@ -598,16 +517,6 @@ label.required::after {
         status.textContent = 'Please select your faculty.';
         return;
       }
-
-      //save only name to local storage for if toggle is checked
-      if (rememberToggle.checked) {
-        localStorage.setItem("clubName", name);
-        localStorage.setItem("clubPhone", phone);
-        localStorage.setItem("clubGrad", grad);
-        localStorage.setItem("clubEmail", email);
-        localStorage.setItem("clubBirthday", birthday);
-        localStorage.setItem("clubFaculty", faculty);
-      }
       
 
       showWelcomeMessage(name,false);
@@ -696,40 +605,20 @@ label.required::after {
       });
     }
     
-    document.getElementById('eraseNow').addEventListener('click', (e) => {
-      e.preventDefault();
-      localStorage.removeItem("clubName");
-      localStorage.removeItem("clubPhone");
-      localStorage.removeItem("clubEmail");
-      localStorage.removeItem("clubGrad");
-      localStorage.removeItem("clubBirthday");
-      localStorage.removeItem("clubFaculty");
-
-      nameInput.value = '';
-      document.getElementById('phone').value = '';
-      document.getElementById('email').value = '';
-      document.getElementById('grad').value = "";
-      document.getElementById('birthday').value = '';
-      document.getElementById('faculty').value = '';
-      
-      status.textContent = 'Your saved profile has been removed.';
-      hideWelcomeMessage();
-      setTimeout(() => { status.textContent = ''; }, 5000);
-    });
 
 
     document.getElementById('submitReasonButton').addEventListener('click', () => {
       reasonSection.style.display ='none';
-   const name = nameInput.value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const grad = document.getElementById('grad').value.trim();
-    const birthday = document.getElementById('birthday').value;
-    const faculty = document.getElementById('faculty').value;
-    const reason = reasonSelect.value;
-    const other = reasonOther.value.trim();
+      const name = nameInput.value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const grad = document.getElementById('grad').value.trim();
+      const birthday = document.getElementById('birthday').value;
+      const faculty = document.getElementById('faculty').value;
+      const reason = reasonSelect.value;
+      const other = reasonOther.value.trim();
 
-    handleReasonSubmit(name, phone, email, grad, birthday, faculty, reason, other);
+      handleReasonSubmit(name, phone, email, grad, birthday, faculty, reason, other);
     });
 
 
@@ -748,34 +637,7 @@ label.required::after {
       }
 
       loadReasons();
-      const savedName = localStorage.getItem("clubName");
-      const savedPhone = localStorage.getItem("clubPhone") || "";
-      const savedEmail = localStorage.getItem("clubEmail");
-      const savedGrad = localStorage.getItem("clubGrad");
-      const savedBirthday = localStorage.getItem("clubBirthday");
-      const savedFaculty = localStorage.getItem("clubFaculty");
-
-      if (savedName) {
-        status.classList.add("status-auto");
-        status.classList.remove("status-success");
-    
-        nameInput.value = savedName; //keep filled for quick check-in
-        document.getElementById('phone').value = savedPhone;
-        document.getElementById('email').value = savedEmail;
-        document.getElementById('grad').value = savedGrad;
-        document.getElementById('birthday').value = savedBirthday;
-        document.getElementById('faculty').value = savedFaculty;
-
-        rememberToggle.checked = true;
-        showWelcomeMessage(savedName, true);
-
-        //setTimeout(() => {clearDisplay(); status.textContent = ""; status.classList.remove("status-auto"); }, 5000);
-      } else {
-        rememberToggle.checked = true;
-        hideWelcomeMessage();
-      }
       
-        
     });
 
     function getQueryParam(param) {
